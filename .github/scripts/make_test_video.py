@@ -27,10 +27,26 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 import os
+
+def _find_clean_cut(root: Path) -> Path:
+    """Locate the skill whether this is the work repo or the test repo.
+
+    The work repo keeps it at Projects/clean-cut; the platform-test repo keeps
+    it at clean-cut/. Hard-coding either one means the helper only runs in one
+    of the two places, which is how the first Windows run died before it got
+    anywhere near ffmpeg.
+    """
+    env = os.environ.get("CLEAN_CUT_DIR")
+    if env:
+        return Path(env).resolve()
+    for rel in ("clean-cut", "Projects/clean-cut"):
+        if (root / rel / "scripts" / "setup.py").is_file():
+            return root / rel
+    raise SystemExit(f"cannot find the clean-cut folder under {root}")
+
+
 SCRIPTS = Path(os.environ.get("CLEAN_CUT_SCRIPTS")
-               or Path(os.environ.get("CLEAN_CUT_DIR")
-                       or ROOT / "Projects" / "clean-cut")
-               / "reference" / "master-scripts.json")
+               or _find_clean_cut(ROOT) / "reference" / "master-scripts.json")
 WANT_SCRIPT = 4
 
 

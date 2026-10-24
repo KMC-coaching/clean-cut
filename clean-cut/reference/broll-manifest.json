@@ -1,0 +1,235 @@
+{
+ "_what": "Every clip in the curated b-roll library, by its source on Pexels. The library is 608MB and does not belong in git; this rebuilds it on any machine.",
+ "_why_not_the_harvester": "build_broll_library.py pulls FRESH clips and names them by category order, so a second run produces different footage under the same filenames - and script-broll.json names exact files. The curation is the value: of 54 candidates sourced in one pass, 54 were rejected (Euro notes, a hotel room, a child's face, FRIGIDAIRE on an oven drawer). Rebuilding from these IDs gets the screened set, not a fresh unscreened one.",
+ "_licence": "Pexels content licence: free for commercial use, no attribution required. Downloaded from https://www.pexels.com/download/video/<id>/ - no API key.",
+ "_verify": "md5_2mb is the MD5 of the first 2MB, enough to catch a wrong or truncated file without hashing 600MB.",
+ "_missing": "HOME_1.mp4 has no recoverable source and is NOT referenced by script-broll.json. It is omitted deliberately.",
+ "required_count": 16,
+ "clips": [
+  {
+   "file": "APPROVAL/APPROVAL_1.mp4",
+   "pexels_id": "7841865",
+   "bytes": 5846972,
+   "md5_2mb": "aff9f067f9ee5ff86779b1f9c051010c",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/7841865/7841865-hd_1080_1920_30fps.mp4"
+  },
+  {
+   "file": "APPROVAL/APPROVAL_2.mp4",
+   "pexels_id": "8555728",
+   "bytes": 20583375,
+   "md5_2mb": "9d7ef748dca0cc59ba11ca156f04604f",
+   "required": false,
+   "cdn": "https://videos.pexels.com/video-files/8555728/8555728-uhd_2160_3840_24fps.mp4"
+  },
+  {
+   "file": "APPROVAL/APPROVAL_3.mp4",
+   "pexels_id": "8814707",
+   "bytes": 21083084,
+   "md5_2mb": "1285cc82ab6bafcf560f4f524f94620e",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/8814707/8814707-uhd_2160_3840_25fps.mp4"
+  },
+  {
+   "file": "DEFECT/DEFECT_1.mp4",
+   "pexels_id": "7830152",
+   "bytes": 61925752,
+   "md5_2mb": "884be494d06c9396adf24a754cda8baa",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/7830152/7830152-uhd_2160_3840_30fps.mp4"
+  },
+  {
+   "file": "DEFECT/DEFECT_2.mp4",
+   "pexels_id": "6108991",
+   "bytes": 5868949,
+   "md5_2mb": "dec0958a30ea5c334a4215fa3ffe7671",
+   "required": false,
+   "cdn": "https://videos.pexels.com/video-files/6108991/6108991-hd_1080_1920_25fps.mp4"
+  },
+  {
+   "file": "DEFECT/DEFECT_3.mp4",
+   "pexels_id": "7830059",
+   "bytes": 35928690,
+   "md5_2mb": "862839156f6d4cf5c51e58724b79f3c4",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/7830059/7830059-uhd_2160_3840_30fps.mp4"
+  },
+  {
+   "file": "HOME/HOME_2.mp4",
+   "pexels_id": "36991690",
+   "bytes": 114133590,
+   "md5_2mb": "81ccb920c9a0ea2cc119709964e377f5",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/36991690/15670317_2160_3840_30fps.mp4"
+  },
+  {
+   "file": "HOME/HOME_3.mp4",
+   "pexels_id": "39071089",
+   "bytes": 52816163,
+   "md5_2mb": "a1cd9dd6396a5554c953da4e9374b07a",
+   "required": false,
+   "cdn": "https://videos.pexels.com/video-files/39071089/16625442_2160_3840_60fps.mp4"
+  },
+  {
+   "file": "HOME/HOME_4.mp4",
+   "pexels_id": "36778247",
+   "bytes": 39309494,
+   "md5_2mb": "d793ffcc363db8b61014d36ec57592be",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/36778247/15585734_1080_1920_30fps.mp4"
+  },
+  {
+   "file": "KEYS/KEYS_1.mp4",
+   "pexels_id": "7986204",
+   "bytes": 26117471,
+   "md5_2mb": "d2ae671dfa02a9627a559893bdde3c37",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/7986204/7986204-uhd_2160_3840_25fps.mp4"
+  },
+  {
+   "file": "MONEY/MONEY_1.mp4",
+   "pexels_id": "6700011",
+   "bytes": 16457404,
+   "md5_2mb": "e4dad18a7be8b4c23acdc5e818974113",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/6700011/6700011-uhd_2160_3840_25fps.mp4"
+  },
+  {
+   "file": "MONEY/MONEY_2.mp4",
+   "pexels_id": "6266261",
+   "bytes": 14650785,
+   "md5_2mb": "7ee8bbf1e84630cb305a264ff03583c8",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/6266261/6266261-uhd_2160_3840_25fps.mp4"
+  },
+  {
+   "file": "MONEY/MONEY_3.mp4",
+   "pexels_id": "6693624",
+   "bytes": 22946150,
+   "md5_2mb": "a9434b0422ab817ba5be1493c112562c",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/6693624/6693624-uhd_2160_3840_25fps.mp4"
+  },
+  {
+   "file": "MONEY/MONEY_4.mp4",
+   "pexels_id": "7735913",
+   "bytes": 8113637,
+   "md5_2mb": "c047917d2296df638ad320cec2bd0dc1",
+   "required": false,
+   "cdn": "https://videos.pexels.com/video-files/7735913/7735913-hd_1080_1920_25fps.mp4"
+  },
+  {
+   "file": "PREP/PREP_1.mp4",
+   "pexels_id": "5583172",
+   "bytes": 2069737,
+   "md5_2mb": "2ca40391dea07221b80eafc41c495a50",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/5583172/5583172-hd_1080_1920_30fps.mp4"
+  },
+  {
+   "file": "PREP/PREP_2.mp4",
+   "pexels_id": "5583184",
+   "bytes": 2174345,
+   "md5_2mb": "8d79a9b32f00bad6c92bdf5b64834987",
+   "required": false,
+   "cdn": "https://videos.pexels.com/video-files/5583184/5583184-hd_1080_1920_30fps.mp4"
+  },
+  {
+   "file": "PREP/PREP_3.mp4",
+   "pexels_id": "5799484",
+   "bytes": 6055244,
+   "md5_2mb": "4fb2940ce7137acf15e5b4dc36ef2482",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/5799484/5799484-hd_1080_1920_25fps.mp4"
+  },
+  {
+   "file": "PREP/PREP_4.mp4",
+   "pexels_id": "7216700",
+   "bytes": 15831651,
+   "md5_2mb": "8346f22c29da0efca24c8ebf0b8eab4d",
+   "required": false,
+   "cdn": "https://videos.pexels.com/video-files/7216700/7216700-uhd_2160_3840_24fps.mp4"
+  },
+  {
+   "file": "ROOM/ROOM_1.mp4",
+   "pexels_id": "36991695",
+   "bytes": 23947184,
+   "md5_2mb": "7644ac4fde0a0f5b1a15144eb65eacb8",
+   "required": false,
+   "cdn": "https://videos.pexels.com/video-files/36991695/15670329_2160_3840_30fps.mp4"
+  },
+  {
+   "file": "ROOM/ROOM_2.mp4",
+   "pexels_id": "37252342",
+   "bytes": 9220965,
+   "md5_2mb": "97c4312825f3551ca18f25831b53becb",
+   "required": false,
+   "cdn": "https://videos.pexels.com/video-files/37252342/15781363_2160_3840_60fps.mp4"
+  },
+  {
+   "file": "ROOM/ROOM_3.mp4",
+   "pexels_id": "37252343",
+   "bytes": 14340698,
+   "md5_2mb": "d729d75952965cdf2e3c8b5897d4b6b7",
+   "required": false,
+   "cdn": "https://videos.pexels.com/video-files/37252343/15781369_2160_3840_60fps.mp4"
+  },
+  {
+   "file": "ROOM/ROOM_4.mp4",
+   "pexels_id": "38893136",
+   "bytes": 11419467,
+   "md5_2mb": "3bfc9137783d29f0f7b5ad042c52c850",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/38893136/16537419_1080_1920_60fps.mp4"
+  },
+  {
+   "file": "SIGN/SIGN_1.mp4",
+   "pexels_id": "7578271",
+   "bytes": 21366234,
+   "md5_2mb": "a0ea952a43e5fd0af0c24e7d1d2b1332",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/7578271/7578271-uhd_2160_3840_30fps.mp4"
+  },
+  {
+   "file": "TIME/TIME_1.mp4",
+   "pexels_id": "35332817",
+   "bytes": 9959268,
+   "md5_2mb": "4e3f394de62970b5bef3430fcf162148",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/35332817/14970418_2160_3840_30fps.mp4"
+  },
+  {
+   "file": "TIME/TIME_2.mp4",
+   "pexels_id": "7034335",
+   "bytes": 3578835,
+   "md5_2mb": "6d7ecf0b1780f56237b8c83662f5c42c",
+   "required": false,
+   "cdn": "https://videos.pexels.com/video-files/7034335/7034335-hd_1080_1920_25fps.mp4"
+  },
+  {
+   "file": "TIME/TIME_3.mp4",
+   "pexels_id": "11267667",
+   "bytes": 1528286,
+   "md5_2mb": "23c49550456ef475b84e3571dfc7b9de",
+   "required": false,
+   "cdn": "https://videos.pexels.com/video-files/11267667/11267667-hd_1080_1920_30fps.mp4"
+  },
+  {
+   "file": "TIME/TIME_4.mp4",
+   "pexels_id": "7550648",
+   "bytes": 17595342,
+   "md5_2mb": "bbffb7bc54cc8760af1e622cd1f5380c",
+   "required": false,
+   "cdn": "https://videos.pexels.com/video-files/7550648/7550648-uhd_2160_3840_30fps.mp4"
+  },
+  {
+   "file": "VIEWING/VIEWING_1.mp4",
+   "pexels_id": "7578791",
+   "bytes": 13627240,
+   "md5_2mb": "8c51971d970e06e706014be87605eb77",
+   "required": true,
+   "cdn": "https://videos.pexels.com/video-files/7578791/7578791-uhd_2160_3840_30fps.mp4"
+  }
+ ],
+ "_cdn": "`cdn` is where the download link redirects to: Pexels' own file host, which has no bot check in front of it. fetch_broll.py tries it first and falls back to the /download/ link, because a re-encode on Pexels' side would change the CDN filename while the /download/ link keeps working."
+}

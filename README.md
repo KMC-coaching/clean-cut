@@ -1,33 +1,59 @@
-# clean-cut platform tests
+# clean-cut
 
-This repo exists for one job: proving the `clean-cut` video editor installs
-and runs on machines that are not the one it was written on — real Windows,
-real Intel macOS, real Linux — using GitHub's hosted runners.
+Turns a raw talking-head video into a finished vertical cut: dead air trimmed,
+fumbled takes and countdown false starts removed, captions burned in, b-roll
+dropped over the lines it was chosen for, audio levelled for social.
 
-**It is not where clean-cut is developed.** The source of truth is
-`Projects/clean-cut` in Jerry's work repo. The `clean-cut/` folder here is a
-copy of that code, pushed when a platform run is wanted, and should never be
-edited here.
+It runs **entirely on your own computer**. Nothing is uploaded, there is no
+account and no subscription, and no per-video cost.
 
-## What is deliberately missing
+## Install it
 
-No master scripts and no b-roll. Those are the client's twelve scripts and
-403 MB of licensed Pexels footage, and neither belongs in a repository whose
-only purpose is running tests. `.github/scripts/make_fixtures.py` writes an
-invented script and three ffmpeg test patterns instead, so every run still
-exercises script identification, b-roll placement, and the whole
-zoompan/alphamerge/overlay chain — against content nobody owns.
+**Windows** — open PowerShell (press Start, type `powershell`, Enter) and paste:
 
-No sample video either: the real student uploads are recordings of
-identifiable people. `make_test_video.py` speaks the fixture script through
-the operating system's own text-to-speech, so each runner edits real speech
-and nobody is in it.
+```powershell
+irm https://raw.githubusercontent.com/KMC-coaching/clean-cut/main/install.ps1 | iex
+```
 
-## Running it
+**macOS or Linux** — open Terminal (⌘-Space, type `terminal`, Enter) and paste:
 
-Actions → **clean-cut platforms** → Run workflow, and pick a platform group.
-Manual only, on purpose: on a private repo macOS bills at 10x and Windows at
-2x, so this does not run on push.
+```bash
+curl -fsSL https://raw.githubusercontent.com/KMC-coaching/clean-cut/main/install.sh | bash
+```
 
-Each run uploads the finished video, its decision report, and three frames,
-so the result can be looked at rather than inferred from a passing audit.
+That is the whole thing. It needs no administrator password and no package
+manager: it fetches Python if you have none, fetches ffmpeg, builds its own
+private environment, downloads the b-roll, checks the machine, and then prints
+the exact command to edit a video.
+
+Allow about twenty minutes and roughly 3.5 GB of space. Most of it is
+downloading, so you can leave it running.
+
+## Then edit a video
+
+The installer prints this with the right path filled in:
+
+```bash
+python3 ~/clean-cut/clean-cut/scripts/run.py "my-video.mp4"
+```
+
+The finished file lands next to the original as `my-video-edited.mp4`.
+
+`START-HERE.md` has the rest: what to do when something goes wrong, how much
+memory a render wants, and what the tool deliberately will not do.
+
+## Two files are not in here
+
+Script recognition and b-roll placement need `master-scripts.json` and
+`script-broll.json`, which are the client's own scripts and are not public.
+Ask whoever sent you this for them and drop them into
+`clean-cut/reference/`. Without them everything else still works — trimming,
+captions, sound, stabilisation — but no b-roll is placed.
+
+## Platform tests
+
+`.github/workflows/clean-cut-platforms.yml` installs and runs a real edit on
+hosted Windows, Intel macOS and Linux runners. It carries no client content
+and no recordings of anyone: CI writes an invented script and three ffmpeg
+test patterns, and speaks them through the operating system's own
+text-to-speech.

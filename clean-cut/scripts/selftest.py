@@ -172,10 +172,15 @@ def check_paths() -> None:
     r = subprocess.run([PY, str(HERE / "test_paths.py")], capture_output=True,
                        text=True)
     for ln in r.stdout.splitlines():
-        if "FAIL" in ln or "passed" in ln:
+        if any(k in ln for k in ("FAIL", "passed", "skip")):
             print(f"        {ln.strip()}")
     if r.returncode != 0:
-        bad("test_paths.py failed - see above")
+        # Print everything when it fails. Filtering to lines containing "FAIL"
+        # hid the actual reason on the first Windows run and left "see above"
+        # pointing at nothing.
+        for ln in (r.stdout + r.stderr).splitlines():
+            print(f"        {ln}")
+        bad("test_paths.py failed - output above")
     else:
         ok("every case rendered")
 

@@ -16,6 +16,7 @@ the honest limit of this file: it proves the escaping, not the platform.
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import tempfile
@@ -54,6 +55,20 @@ CASES = [
 ]
 
 
+# Windows forbids these outright in a path component, so a case using one
+# cannot be created there, let alone rendered. Skipping is honest; pretending
+# to have tested it would not be. The Windows DRIVE colon - the thing this
+# file exists for - is checked separately below, as a string, because no
+# machine but Windows can hold one.
+ILLEGAL_ON_WINDOWS = set('<>:"|?*')
+
+
+def impossible_here(name: str) -> str:
+    if os.name == "nt" and (bad := ILLEGAL_ON_WINDOWS & set(name)):
+        return f"windows cannot create a folder containing {''.join(sorted(bad))}"
+    return ""
+
+
 def run_case(root: Path, name: str) -> tuple[bool, str]:
     d = root / name
     d.mkdir(parents=True, exist_ok=True)
@@ -78,6 +93,10 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
         for name in CASES:
+            why = impossible_here(name)
+            if why:
+                print(f"  skip {name}   {why}")
+                continue
             ok, err = run_case(root, name)
             bad += not ok
             print(f"  {'ok  ' if ok else 'FAIL'} {name}" + (f"   {err}" if err else ""))
@@ -94,8 +113,11 @@ def main() -> int:
     else:
         print("  ok   drive colon escaped, separators normalised to /")
 
+    ran = sum(1 for c in CASES if not impossible_here(c)) + 1
     print("-" * 66)
-    print(f"{len(CASES) + 1 - bad} of {len(CASES) + 1} passed")
+    print(f"{ran - bad} of {ran} passed"
+          + (f"  ({len(CASES) + 1 - ran} skipped on this platform)"
+             if ran < len(CASES) + 1 else ""))
     return 1 if bad else 0
 
 

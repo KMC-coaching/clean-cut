@@ -367,8 +367,12 @@ def main() -> int:
     info(f"library: {P.BROLL_DIR}")
     info("the speech model (about 1.5 GB) downloads on the first real edit")
     print()
+    # Print the SAME command the installer prints. run.py re-executes itself
+    # into the venv, so plain python3 is correct and is one less path for a
+    # person to mistype; showing two different commands back to back just
+    # makes them wonder which one is right.
     info("To edit a video:")
-    info(f"   {py} {HERE / 'run.py'} \"your-video.mp4\"")
+    info(f"   python3 {HERE / 'run.py'} \"your-video.mp4\"")
     if rc != 0:
         print("\n   Setup finished, but the checks above found blocking problems.")
         print("   Fix those before editing a video, then run this again.")

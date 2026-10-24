@@ -1,0 +1,160 @@
+name: clean-cut platforms
+
+# Does clean-cut actually install and edit a video on a machine that is not
+# Jerry's? Runs the real installer and a real edit on each image, with no
+# pre-installed Python packages and no help.
+#
+# Manual only. macOS minutes bill at 10x and Windows at 2x on a private repo,
+# so this does not run on push.
+
+on:
+  workflow_dispatch:
+    inputs:
+      platforms:
+        description: "Which images to test"
+        type: choice
+        default: "windows"
+        options: ["windows", "mac", "linux", "all"]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # "new Windows, old Windows"
+          - { os: windows-latest, name: "Windows (latest)",    group: windows }
+          - { os: windows-2022, name: "Windows Server 2022",   group: windows }
+          # "new Mac, old Mac" - macos-13 is the last Intel image
+          - { os: macos-15,     name: "macOS 15 (Apple Si)",   group: mac }
+          - { os: macos-14,     name: "macOS 14 (Apple Si)",   group: mac }
+          - { os: macos-13,     name: "macOS 13 (Intel)",      group: mac }
+          - { os: ubuntu-24.04, name: "Ubuntu 24.04",          group: linux }
+          - { os: ubuntu-22.04, name: "Ubuntu 22.04",          group: linux }
+
+    steps:
+      - name: Skip images not asked for
+        id: want
+        shell: bash
+        run: |
+          want='${{ inputs.platforms }}'
+          mine='${{ matrix.group }}'
+          if [ "$want" = "all" ] || [ "$want" = "$mine" ]; then
+            echo "run=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=no" >> "$GITHUB_OUTPUT"
+            echo "not selected ($want), skipping"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.want.outputs.run == 'yes'
+
+      # Only so the test VIDEO can be generated. macOS has `say` and Windows
+      # has SAPI built in; Linux has no speech synthesiser at all. This is
+      # test scaffolding, NOT something clean-cut needs.
+      - name: Install a speech synthesiser (Linux only, for the test video)
+        if: steps.want.outputs.run == 'yes' && matrix.group == 'linux'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq espeak-ng
+
+      - name: What this image starts with
+        if: steps.want.outputs.run == 'yes'
+        shell: bash
+        run: |
+          echo "python : $(command -v python3 || command -v python || echo NONE)"
+          (python3 -V || python -V) 2>&1 || true
+          echo "ffmpeg : $(command -v ffmpeg || echo NONE)"
+          ffmpeg -hide_banner -version 2>/dev/null | head -1 || true
+
+      # The self-heal path, on every image, whether or not it already has one.
+      - name: Can this platform fetch its own ffmpeg
+        if: steps.want.outputs.run == 'yes'
+        shell: bash
+        run: python3 .github/scripts/check_ffmpeg_download.py
+
+      - name: Write the test fixtures (no real scripts, no licensed footage)
+        if: steps.want.outputs.run == 'yes'
+        shell: bash
+        run: python3 .github/scripts/make_fixtures.py clean-cut "$HOME/.clean-cut/broll-v2"
+
+      - name: Install (Windows)
+        if: steps.want.outputs.run == 'yes' && matrix.group == 'windows'
+        shell: pwsh
+        run: |
+          $a = @('-ExecutionPolicy','Bypass','-File','clean-cut\scripts\setup.ps1','-Yes')
+          if ('${{ inputs.skip_broll }}' -eq 'true') { $a += '-SkipBroll' }
+          & powershell @a
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Install (macOS and Linux)
+        if: steps.want.outputs.run == 'yes' && matrix.group != 'windows'
+        shell: bash
+        run: |
+          bash clean-cut/scripts/setup.sh --skip-broll
+
+      - name: Check the machine
+        if: steps.want.outputs.run == 'yes'
+        shell: bash
+        run: python3 clean-cut/scripts/doctor.py
+
+      - name: Selftest
+        if: steps.want.outputs.run == 'yes'
+        shell: bash
+        run: python3 clean-cut/scripts/selftest.py
+
+      # No sample video is committed: the real uploads are recordings of
+      # identifiable people. This speaks a master script through the OS's own
+      # text-to-speech instead, so the edit is real and nobody is in it.
+      - name: Build a test video from a master script
+        if: steps.want.outputs.run == 'yes'
+        shell: bash
+        run: python3 .github/scripts/make_test_video.py test-input.mp4
+
+      - name: Edit it, the way a student would
+        if: steps.want.outputs.run == 'yes'
+        shell: bash
+        run: python3 clean-cut/scripts/run.py test-input.mp4 --out edited.mp4
+
+      - name: What came out
+        if: steps.want.outputs.run == 'yes'
+        shell: bash
+        run: |
+          ls -l edited.mp4 edited.report.json
+          python3 - <<'PY'
+          import json, pathlib
+          r = json.loads(pathlib.Path("edited.report.json").read_text())
+          print("script    :", r.get("script") or "UNIDENTIFIED")
+          print("inserts   :", len(r.get("broll") or []))
+          print("captions  :", len(r.get("cue_text") or []))
+          print("duration  :", r.get("duration_before"), "->", r.get("duration_after"))
+          print("stabilised:", r.get("stabilised"))
+          PY
+
+      # A frame each from the start, an insert, and the end. Cheap, and the
+      # only way to see that the picture is right rather than merely passing.
+      - name: Grab frames to look at
+        if: steps.want.outputs.run == 'yes'
+        shell: bash
+        run: |
+          for t in 3 19 28; do
+            ffmpeg -nostdin -v error -ss $t -i edited.mp4 -frames:v 1 \
+              -vf scale=360:-1 -y "frame-$t.png" || true
+          done
+          ls -l frame-*.png || true
+
+      - name: Upload what it produced
+        if: steps.want.outputs.run == 'yes' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-output
+          path: |
+            edited.mp4
+            edited.report.json
+            frame-*.png
+          if-no-files-found: warn
+          retention-days: 5

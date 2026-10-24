@@ -117,18 +117,33 @@ def write_broll(out: Path) -> None:
 
 
 def main() -> int:
-    cc = Path(sys.argv[1]).resolve()
-    broll = Path(sys.argv[2]).expanduser().resolve()
+    # Split in two because of ordering: the scripts are pure JSON and must
+    # exist BEFORE setup runs (doctor checks for them), while the clips need
+    # ffmpeg, which on Windows does not exist until setup has installed it.
+    # Doing both at once passed on Linux and macOS purely because those
+    # runner images happen to ship ffmpeg, and failed on every Windows run.
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    flags = {a for a in sys.argv[1:] if a.startswith("--")}
+    want_scripts = "--broll-only" not in flags
+    want_broll = "--scripts-only" not in flags
+
+    cc = Path(args[0]).resolve()
+    broll = Path(args[1]).expanduser().resolve() if len(args) > 1 else None
     print("writing CI fixtures (no real scripts, no licensed footage)")
-    write_scripts(cc / "reference")
-    write_broll(broll)
+    if want_scripts:
+        write_scripts(cc / "reference")
+    if want_broll:
+        if broll is None:
+            raise SystemExit("a b-roll directory is needed unless --scripts-only")
+        write_broll(broll)
     # The manifest ships for real, and doctor checks the library against it.
     # Point it at what actually exists here.
-    (cc / "reference" / "broll-manifest.json").write_text(json.dumps({
-        "_what": "GENERATED FIXTURE.",
-        "required_count": 0,
-        "clips": [],
-    }, indent=1) + "\n", encoding="utf-8")
+    if want_scripts:
+        (cc / "reference" / "broll-manifest.json").write_text(json.dumps({
+            "_what": "GENERATED FIXTURE.",
+            "required_count": 0,
+            "clips": [],
+        }, indent=1) + "\n", encoding="utf-8")
     print("done")
     return 0
 

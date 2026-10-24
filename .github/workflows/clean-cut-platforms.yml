@@ -77,10 +77,13 @@ jobs:
         shell: bash
         run: python3 .github/scripts/check_ffmpeg_download.py
 
-      - name: Write the test fixtures (no real scripts, no licensed footage)
+      # Scripts first: they are pure JSON, and setup's own checks want them
+      # present. The clips come after install, because making them needs
+      # ffmpeg and on Windows there is none until setup has fetched it.
+      - name: Write the fixture scripts (no real scripts, no licensed footage)
         if: steps.want.outputs.run == 'yes'
         shell: bash
-        run: python3 .github/scripts/make_fixtures.py clean-cut "$HOME/.clean-cut/broll-v2"
+        run: python3 .github/scripts/make_fixtures.py clean-cut --scripts-only
 
       - name: Install (Windows)
         if: steps.want.outputs.run == 'yes' && matrix.group == 'windows'
@@ -96,6 +99,13 @@ jobs:
         shell: bash
         run: |
           bash clean-cut/scripts/setup.sh --skip-broll
+
+      - name: Write the fixture b-roll (needs the ffmpeg setup just installed)
+        if: steps.want.outputs.run == 'yes'
+        shell: bash
+        run: |
+          export PATH="$HOME/.clean-cut/bin:$PATH"
+          python3 .github/scripts/make_fixtures.py clean-cut "$HOME/.clean-cut/broll-v2" --broll-only
 
       - name: Check the machine
         if: steps.want.outputs.run == 'yes'

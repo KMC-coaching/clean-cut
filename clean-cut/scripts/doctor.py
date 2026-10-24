@@ -35,6 +35,30 @@ import cc_paths as _ccp                                        # noqa: E402
 
 _ccp.use_private_tools()
 
+
+def _reexec_in_venv() -> None:
+    """Run under the interpreter setup.py built, if there is one.
+
+    Without this, `python3 doctor.py` checks the packages of whatever Python
+    happened to be on PATH - not the private environment they were installed
+    into - and reports cv2, numpy, PIL and the transcriber missing on a
+    perfectly good install. That is the documented first command to run when
+    something looks wrong, so it was the worst possible thing to be wrong.
+    """
+    import os                                                  # noqa: PLC0415
+    import subprocess                                          # noqa: PLC0415
+    if _ccp.in_our_venv() or os.environ.get("CLEAN_CUT_NO_REEXEC"):
+        return
+    py = _ccp.venv_python()
+    if not py.exists():
+        return                      # not installed yet: report on this one
+    raise SystemExit(subprocess.run(
+        [str(py), str(Path(__file__).resolve()), *sys.argv[1:]],
+        env=dict(os.environ, CLEAN_CUT_NO_REEXEC="1")).returncode)
+
+
+_reexec_in_venv()
+
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 

@@ -197,9 +197,25 @@ def main() -> int:
     add(OK if sz > 100_000 else BAD, "face model yunet.onnx",
         "" if sz > 100_000 else ("missing" if not sz else f"only {sz} bytes - re-run setup.sh"))
 
-    for ref in ("master-scripts.json", "script-broll.json", "broll-manifest.json"):
-        p = ROOT / "reference" / ref
-        add(OK if p.exists() else BAD, f"reference/{ref}", "" if p.exists() else "missing")
+    # broll-manifest ships with the code and its absence IS a fault. The other
+    # two are the client's own scripts, are supplied separately, and their
+    # absence is a missing feature with a known fix - calling that "blocking"
+    # made a correct, expected first install read as a broken one.
+    p = ROOT / "reference" / "broll-manifest.json"
+    add(OK if p.exists() else BAD, "reference/broll-manifest.json",
+        "" if p.exists() else "missing - re-download clean-cut")
+
+    absent = [r for r in ("master-scripts.json", "script-broll.json")
+              if not (ROOT / "reference" / r).exists()]
+    if absent:
+        add(WARN, "script recognition",
+            f"{len(absent)} file(s) not supplied: {', '.join(absent)}\n"
+            f"       ask whoever sent you this for them, and save them in\n"
+            f"       {ROOT / 'reference'}\n"
+            "       Videos are still trimmed, captioned and levelled without\n"
+            "       them; no b-roll is placed.")
+    else:
+        add(OK, "script recognition", "12 scripts and their b-roll decisions")
 
     # ---- the b-roll library
     man = ROOT / "reference" / "broll-manifest.json"

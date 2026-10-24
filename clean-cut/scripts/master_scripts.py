@@ -29,9 +29,20 @@ import json
 import re
 from pathlib import Path
 
-MASTERS = json.loads(
-    (Path(__file__).resolve().parent.parent / "reference" / "master-scripts.json")
-    .read_text())["scripts"]
+_MASTERS_FILE = (Path(__file__).resolve().parent.parent
+                 / "reference" / "master-scripts.json")
+
+# A missing script bank is a MISSING FEATURE, not a crash. The bank is the
+# client's own scripts and does not ship with the public code, so a fresh
+# install has none until someone supplies it - and importing this module used
+# to die on that with a bare FileNotFoundError traceback, before the editor
+# had done a single thing. Everything downstream already handles "no script
+# identified", because a student recording something off-book hits the same
+# path. So load what is there and let identify() say no.
+try:
+    MASTERS = json.loads(_MASTERS_FILE.read_text(encoding="utf-8"))["scripts"]
+except (OSError, KeyError, ValueError):
+    MASTERS = []
 
 # A confident identification. Measured across the twelve raw uploads: the right
 # script scores far above this and the runner-up far below, so the gap does the
@@ -56,7 +67,7 @@ def _full(script: dict) -> str:
 def identify(transcript: str) -> tuple[dict | None, float, list[tuple[str, float]]]:
     """Return (script, score, ranked) - script is None when nothing is confident."""
     heard = _shingles(transcript)
-    if not heard:
+    if not heard or not MASTERS:
         return None, 0.0, []
     scored = []
     for s in MASTERS:
@@ -121,9 +132,15 @@ if __name__ == "__main__":
 # Every filter below DROPS an insert. None relocates one. A relocated insert is
 # an insert nobody decided on - which is how the old floor manufactured filler.
 
-BANK = json.loads(
-    (Path(__file__).resolve().parent.parent / "reference" / "script-broll.json")
-    .read_text())
+_BANK_FILE = (Path(__file__).resolve().parent.parent
+              / "reference" / "script-broll.json")
+
+# Same reasoning as MASTERS above: absent means "no inserts were decided for
+# this script", which place_bank already treats as nothing to place.
+try:
+    BANK = json.loads(_BANK_FILE.read_text(encoding="utf-8"))
+except (OSError, ValueError):
+    BANK = {"scripts": {}}
 
 MIN_GAP_S = 5.0
 # The shortest insert in the delivered human edit. Nothing goes below it.

@@ -64,7 +64,11 @@ main() {
   say "installing (this is the long part - 20 minutes or so)"
   info "it fetches ffmpeg, python packages and the b-roll clips"
   info "nothing here asks for a password"
-  bash "$DEST/clean-cut/scripts/setup.sh"
+  # Never let a non-zero setup abort this script: the guidance below is the
+  # most useful thing a person gets when setup is unhappy, and `set -e` was
+  # swallowing it. They saw "blocking problems" and no command to run.
+  RC=0
+  bash "$DEST/clean-cut/scripts/setup.sh" || RC=$?
 
   # ---------------------------------------------------------------- finish
   REF="$DEST/clean-cut/reference"
@@ -73,7 +77,13 @@ main() {
     [ -f "$REF/$f" ] || MISSING="$MISSING $f"
   done
 
-  say "done"
+  if [ "$RC" -ne 0 ]; then
+    say "setup reported a problem (code $RC)"
+    info "read the lines above - they name what is wrong."
+    info "Re-running the install command is safe and picks up where it left off."
+  else
+    say "done"
+  fi
   echo
   echo "   To edit a video, paste this and change the filename:"
   echo

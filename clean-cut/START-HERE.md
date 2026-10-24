@@ -101,6 +101,11 @@ Two things worth knowing before you start:
 - **It only knows the twelve standard scripts.** Given something else it says
   `UNIDENTIFIED` and still produces a clean talking-head cut — it just will
   not place b-roll, because a wrong clip is worse than no clip.
+- **Two files are supplied separately.** `master-scripts.json` and
+  `script-broll.json` are the scripts themselves, and are not in the public
+  download. Ask whoever sent you this and drop them into
+  `clean-cut/reference/`. `doctor.py` tells you if they are missing. Until
+  then every video comes out `UNIDENTIFIED`, which is the case above.
 
 ---
 

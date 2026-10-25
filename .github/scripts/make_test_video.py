@@ -114,6 +114,18 @@ def speak(text: str, wav: Path) -> None:
     if not wav.exists() or wav.stat().st_size < 10_000:
         raise SystemExit(f"text-to-speech produced nothing usable at {wav}")
 
+    # Bring it to roughly the level of a real phone recording. Each platform's
+    # voice comes out at a different level - Windows SAPI is markedly quieter
+    # than macOS `say` - and the editor's own normalisation could not pull
+    # that one up to -14, so the audit failed on the TEST MATERIAL rather
+    # than on anything the platform did. -20 LUFS is a normal recording, not
+    # a pre-cooked answer: clean-cut still has real work to do from here.
+    levelled = wav.with_name("levelled.wav")
+    subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-i", str(wav),
+                    "-af", "loudnorm=I=-20:TP=-2:LRA=11",
+                    "-ar", "48000", "-ac", "1", str(levelled)], check=True)
+    levelled.replace(wav)
+
 
 def main() -> int:
     out = Path(sys.argv[1]).resolve()

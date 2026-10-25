@@ -21,7 +21,7 @@ Remedies, per rule:
   broll_no_filler       no remedy - same. The plan gets rewritten by hand
   broll_no_adjacent     re-pick with the clashing category suppressed
   camera_steady         force stabilisation even if the source measured steady
-  loudness_target       nudge the normalisation target
+  loudness_target       no knob yet; reported and the loop stops
   no_rotation_flag      re-run with the source normalised (should be automatic)
 
 Anything with no remedy is reported and the loop stops - a rule it cannot act
@@ -140,7 +140,13 @@ def main() -> int:
             print(f"PASSES CLEAN on pass {p}.")
             return 0
 
-        # choose remedies for this round
+        # choose remedies for this round.
+        # `before` guards the whole loop against a remedy that changes
+        # nothing: one of them only printed a message, which still counted as
+        # progress, so the same render repeated until the pass limit and
+        # produced a byte-identical file every time. On Windows that was four
+        # full renders of a 50s video to reach the result pass 1 already had.
+        before = dict(overrides)
         applied = []
         for f in fails:
             key = rule_key(f, list(RULE_DESCS))
@@ -159,7 +165,12 @@ def main() -> int:
                 overrides["CLEANCUT_FORCE_STAB"] = "1"
                 applied.append("stabilisation -> forced")
             elif remedy == "nudge_loudness":
-                applied.append("loudness -> (no knob; reported)")
+                # No knob exists for this yet. Say so once and let the
+                # "nothing changed" check below stop the loop.
+                print("   loudness is off target and there is no knob for it; "
+                      "the source is probably very quiet")
+        if overrides == before:
+            applied = []
         if not applied:
             print("\nNo remedy for the remaining failures. Stopping so a person can look:")
             for f in fails:

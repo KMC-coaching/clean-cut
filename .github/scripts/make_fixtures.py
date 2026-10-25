@@ -116,6 +116,16 @@ def write_broll(out: Path) -> None:
         print(f"   clip:    {dest}  {dest.stat().st_size // 1024} KB")
 
 
+def _use_private_ffmpeg(cc: Path) -> None:
+    """Prefer the ffmpeg clean-cut installed, as the editor itself does."""
+    sys.path.insert(0, str(cc / "scripts"))
+    try:
+        import cc_paths                                         # noqa: PLC0415
+    except ImportError:
+        return
+    cc_paths.use_private_tools()
+
+
 def main() -> int:
     # Split in two because of ordering: the scripts are pure JSON and must
     # exist BEFORE setup runs (doctor checks for them), while the clips need
@@ -135,6 +145,7 @@ def main() -> int:
     if want_broll:
         if broll is None:
             raise SystemExit("a b-roll directory is needed unless --scripts-only")
+        _use_private_ffmpeg(cc)
         write_broll(broll)
     # The manifest ships for real, and doctor checks the library against it.
     # Point it at what actually exists here.

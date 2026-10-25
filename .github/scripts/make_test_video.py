@@ -45,8 +45,19 @@ def _find_clean_cut(root: Path) -> Path:
     raise SystemExit(f"cannot find the clean-cut folder under {root}")
 
 
+_CC = _find_clean_cut(ROOT)
 SCRIPTS = Path(os.environ.get("CLEAN_CUT_SCRIPTS")
-               or _find_clean_cut(ROOT) / "reference" / "master-scripts.json")
+               or _CC / "reference" / "master-scripts.json")
+
+# Use the ffmpeg clean-cut installed for itself. On Windows the runner has
+# none of its own, so calling plain `ffmpeg` here died with WinError 2 even
+# though setup had just put a working one in ~/.clean-cut/bin. Resolving it
+# the same way the editor does means this helper does not depend on the
+# workflow remembering to extend PATH.
+sys.path.insert(0, str(_CC / "scripts"))
+import cc_paths as _ccp                                        # noqa: E402
+
+_ccp.use_private_tools()
 WANT_SCRIPT = 4
 
 

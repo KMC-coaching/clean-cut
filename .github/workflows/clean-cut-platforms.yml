@@ -151,6 +151,7 @@ jobs:
         if: steps.want.outputs.run == 'yes'
         shell: bash
         run: |
+          export PATH="$HOME/.clean-cut/bin:$PATH"
           for t in 3 19 28; do
             ffmpeg -nostdin -v error -ss $t -i edited.mp4 -frames:v 1 \
               -vf scale=360:-1 -y "frame-$t.png" || true

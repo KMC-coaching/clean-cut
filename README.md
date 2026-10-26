@@ -42,14 +42,6 @@ The finished file lands next to the original as `my-video-edited.mp4`.
 `START-HERE.md` has the rest: what to do when something goes wrong, how much
 memory a render wants, and what the tool deliberately will not do.
 
-## Two files are not in here
-
-Script recognition and b-roll placement need `master-scripts.json` and
-`script-broll.json`, which are the client's own scripts and are not public.
-Ask whoever sent you this for them and drop them into
-`clean-cut/reference/`. Without them everything else still works — trimming,
-captions, sound, stabilisation — but no b-roll is placed.
-
 ## Platform tests
 
 `.github/workflows/clean-cut-platforms.yml` installs and runs a real edit on

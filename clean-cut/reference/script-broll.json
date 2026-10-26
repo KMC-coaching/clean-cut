@@ -1,0 +1,296 @@
+{
+ "_what": "B-roll decided ONCE per standard script, against the master text, and reused for every student who records it. Each insert names an anchor phrase from the master; the planner finds that phrase in this student's own word timings and places the clip there.",
+ "_why_this_is_not_the_old_regex": "The old system inferred relevance at render time from whether a trigger word appeared - which is how a toolbox landed in a mortgage video because the speaker said 'inspections' once. Nothing here is inferred. A human read the whole script, decided the clip earns its place, and wrote down why. The only automated step is LOCATING an already-decided phrase in this take, which is timing work, not judgement.",
+ "_reuse": "There are twelve scripts and hundreds of uploads. Deciding well once beats re-deriving badly every time.",
+ "_rules": "Anchors must be distinctive enough not to match twice. An insert is dropped, never relocated, if the phrase is missing (the student skipped the line), if it collides with the hook or the name reveal, or if it lands within 5s of the previous insert. Dropping is correct: nothing is better than wrong.",
+ "_gaps": {
+  "11": "10 Must-Nots is a list of things NOT to do. Almost any illustrative clip reads as endorsement - a staged living room over 'don't buy furniture' shows furniture approvingly. Only one insert is safe.",
+  "12": "'Staged with modern furniture' has no clip. The only furnished rooms in the library are a hotel suite. Dropped rather than substituted - a hotel room over a line about staging a house is the kind of near-miss that reads as wrong.",
+  "brand_check": "There is NO automated check for readable brand text. The rule demands one and a human eye is currently the only enforcement. FRIGIDAIRE sat in the library through a full review because it was approved from a 176px thumbnail.",
+  "staged_room_vs_artwork": "OPEN QUESTION FOR JERRY, not something to decide quietly. .claude/rules/image-sourcing.md rejects an image with 'visible artwork' full stop. All EIGHTEEN staged-room candidates were sourced and reviewed one by one; the good ones all carry framed prints on the wall, because that is what staging IS. The best of them (pexels 13582933) is a warm, genuinely domestic room - sofa, fireplace, rug, lamps - and has seven framed abstracts above the sofa. The one with near-bare walls (29681897) is 3.3s, under the 3.5s insert floor. So the brief is close to unsatisfiable as the rule is written. Nothing was added. Script 12's staging insert stays dropped and script 4's staging line uses ROOM_4, an EMPTY room, which passes cleanly - an empty room is arguably the better read of 'visualize living there' anyway. If the rule is meant to catch recognizable or original works rather than mass-produced decor, say so and 13582933 goes straight in. The rest of the batch failed on other grounds anyway: a person on a bed, a cat on a sofa, a TV displaying content, a lit fireplace with an ornate rug, and several European-looking apartments. So the question is real but it is not the only thing standing between us and a staged-room clip.",
+  "viewing_faces": "The showing shot is hard to source because the footage is made to show faces. Of 17 candidates only one is back-view throughout (VIEWING_1). The best of the rest - two people walking up front steps to a door, exactly the shot Jerry described - has a CHILD'S face clearly recognizable at 6.0s, and its face-free window is 2.9s, under the insert floor. Rejected rather than trimmed."
+ },
+ "scripts": {
+  "1": {
+   "title": "Why Hire A Realtor",
+   "inserts": [
+    {
+     "anchor": "costs them an average",
+     "category": "MONEY",
+     "lead": 0.0,
+     "length": 3.5,
+     "why": "The hook's whole weight is a number of dollars the seller never sees. Cash counted in hand is that loss made concrete, and at deposit scale rather than vault scale.",
+     "clip": "MONEY_2.mp4"
+    },
+    {
+     "anchor": "your largest investment",
+     "category": "HOME",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "She calls the home the biggest asset the viewer owns. A whole house front is literally the thing being discussed, not a metaphor for it.",
+     "clip": "HOME_4.mp4"
+    }
+   ]
+  },
+  "2": {
+   "title": "How Quickly Will My Home Sell",
+   "inserts": [
+    {
+     "anchor": "homes sell in days",
+     "category": "TIME",
+     "lead": -0.2,
+     "length": 3.5,
+     "why": "The subject of this script is elapsed time on market; the TIME brief exists for exactly this line.",
+     "clip": "TIME_1.mp4"
+    },
+    {
+     "anchor": "$50k+ on the table",
+     "category": "MONEY",
+     "lead": -0.6,
+     "length": 3.5,
+     "why": "'Leaving $50k on the table' is the cost of mistiming. Cash in hand is the money being left.",
+     "clip": "MONEY_3.mp4"
+    }
+   ]
+  },
+  "3": {
+   "title": "Thinking About Buying",
+   "inserts": [
+    {
+     "anchor": "finding homes",
+     "category": "HOME",
+     "lead": -0.3,
+     "length": 4.5,
+     "why": "She names finding a home as the first thing an agent does. This is the house at the end of that search, and the hook already called it a dream home.",
+     "clip": "HOME_2.mp4"
+    },
+    {
+     "anchor": "day one to keys",
+     "category": "KEYS",
+     "lead": -0.4,
+     "length": 2.6,
+     "why": "'From day one to keys' is the payoff line of the script. The clip is a hand holding a set of keys beside a front-door knob in warm light - the moment the line is describing, landing as she says the word.",
+     "clip": "KEYS_1.mp4"
+    }
+   ]
+  },
+  "4": {
+   "title": "Curb Appeal",
+   "inserts": [
+    {
+     "anchor": "fresh paint on front door",
+     "category": "PREP",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "The PREP brief is a brush at a door edge. The line is a brush at a door edge.",
+     "clip": "PREP_3.mp4"
+    },
+    {
+     "anchor": "helps buyers visualize living",
+     "category": "ROOM",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "Staging is about a buyer picturing themselves in the space. An empty, clean, daylit room is literally that - and it is a real house, which the two furnished ROOM clips are not.",
+     "clip": "ROOM_4.mp4"
+    },
+    {
+     "anchor": "get sellers maximum value",
+     "category": "HOME",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "The close returns to the house as a whole after three paragraphs of detail; the wide front is the payoff of the work just described.",
+     "clip": "HOME_4.mp4"
+    }
+   ]
+  },
+  "5": {
+   "title": "Digital Marketing",
+   "inserts": [
+    {
+     "anchor": "yard sign and MLS listing",
+     "category": "SIGN",
+     "clip": "SIGN_1.mp4",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "The line names a yard sign as the thing lazy agents rely on. A plain FOR SALE board in a front lawn is that, literally - and carries no agency name, so it is nobody's trademark."
+    },
+    {
+     "anchor": "thousands of qualified buyers",
+     "category": "VIEWING",
+     "clip": "VIEWING_1.mp4",
+     "lead": -0.4,
+     "length": 3.5,
+     "why": "The claim is that marketing puts the house in front of real buyers. This is two of them standing in the driveway looking up at it - the point of all the online reach, shown as the thing it is for."
+    }
+   ]
+  },
+  "6": {
+   "title": "Approval vs Pre-Qual",
+   "inserts": [
+    {
+     "anchor": "verified employment",
+     "category": "APPROVAL",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "She lists the paperwork a real approval checks. The APPROVAL brief is that paperwork crossing a desk.",
+     "clip": "APPROVAL_1.mp4"
+    },
+    {
+     "anchor": "buyers lose deposits",
+     "category": "MONEY",
+     "lead": -0.2,
+     "length": 3.5,
+     "why": "A deposit is someone's own money, at exactly the scale the MONEY brief insists on.",
+     "clip": "MONEY_1.mp4"
+    }
+   ]
+  },
+  "7": {
+   "title": "Tips to Get Your Offer Accepted",
+   "inserts": [
+    {
+     "anchor": "larger earnest money",
+     "category": "MONEY",
+     "lead": -0.2,
+     "length": 3.5,
+     "why": "Earnest money is cash the buyer puts up. Literal.",
+     "clip": "MONEY_1.mp4"
+    },
+    {
+     "anchor": "full loan approval",
+     "category": "APPROVAL",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "The approval letter is the document this strategy turns on.",
+     "clip": "APPROVAL_3.mp4"
+    },
+    {
+     "anchor": "love their home specifically",
+     "category": "HOME",
+     "lead": -0.4,
+     "length": 3.5,
+     "why": "The last strategy is emotional and about one particular house; a warm whole-front carries that better than any document.",
+     "clip": "HOME_2.mp4"
+    }
+   ]
+  },
+  "8": {
+   "title": "Should I Get Pre-Listing Inspections",
+   "inserts": [
+    {
+     "anchor": "termite damage",
+     "category": "DEFECT",
+     "lead": -0.3,
+     "length": 4.5,
+     "why": "She names the exact failures an inspection turns up. The DEFECT brief is a close, uncomfortable look at one of them.",
+     "clip": "DEFECT_1.mp4"
+    },
+    {
+     "anchor": "need money for your next",
+     "category": "MONEY",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "The risk she is describing is cash she needs for the next purchase being eaten by repairs.",
+     "clip": "MONEY_1.mp4"
+    }
+   ]
+  },
+  "9": {
+   "title": "What to Expect When Buying",
+   "inserts": [
+    {
+     "anchor": "know your exact budget",
+     "category": "APPROVAL",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "Full qualification is a lender's written decision - the paper, not a mood.",
+     "clip": "APPROVAL_3.mp4"
+    },
+    {
+     "anchor": "neighborhoods that appreciate",
+     "category": "HOME",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "House hunting in a neighbourhood: a house with a lawn and a path, seen from the street.",
+     "clip": "HOME_4.mp4"
+    },
+    {
+     "anchor": "never lose your deposit",
+     "category": "MONEY",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "The deposit is the money at risk through escrow, and it is the point of the sentence.",
+     "clip": "MONEY_1.mp4"
+    }
+   ]
+  },
+  "10": {
+   "title": "How Much Money Do I Need",
+   "inserts": [
+    {
+     "anchor": "buying dream homes",
+     "category": "HOME",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "The claim is that an ordinary house is reachable. The HOME clips are deliberately modest and suburban, which is the argument.",
+     "clip": "HOME_2.mp4"
+    },
+    {
+     "anchor": "total out of pocket",
+     "category": "MONEY",
+     "lead": -0.4,
+     "length": 4.0,
+     "why": "A small, countable sum in someone's hand. This is the line where the old library put millions of dollars under a $5,000 figure - the new brief caps the scale for exactly this reason.",
+     "clip": "MONEY_1.mp4"
+    }
+   ]
+  },
+  "11": {
+   "title": "10 Must-Nots When Buying",
+   "inserts": [
+    {
+     "anchor": "spend your closing money",
+     "category": "MONEY",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "The only item on the list where showing the thing does not read as recommending it - the money is what must stay untouched.",
+     "clip": "MONEY_1.mp4"
+    }
+   ]
+  },
+  "12": {
+   "title": "Will Your Home Pass The Test",
+   "inserts": [
+    {
+     "anchor": "fresh landscaping",
+     "category": "PREP",
+     "lead": -0.3,
+     "length": 3.5,
+     "why": "Hands doing yard and paint work - the verb is the subject, which is what the line is asking about.",
+     "clip": "PREP_1.mp4"
+    },
+    {
+     "anchor": "walls neutral with no holes",
+     "category": "DEFECT",
+     "lead": -0.5,
+     "length": 3.5,
+     "why": "Every DEFECT clip in the library is a cracked or broken wall. That is this line, not the carpet line two sentences earlier - a crack over 'carpets showing years of wear' would be the wrong defect.",
+     "clip": "DEFECT_3.mp4"
+    }
+   ]
+  }
+ },
+ "_unusable": {
+  "ROOM_1.mp4": "REJECTED: the oven drawer reads FRIGIDAIRE in legible letters. A real trademark, which the image-sourcing rule rejects outright. Approved earlier from a thumbnail where the badge was invisible.",
+  "ROOM_2.mp4": "REJECTED: a hotel suite, not a home. The brief says 'Not a hotel lobby' and this is the same shoot as ROOM_3.",
+  "ROOM_3.mp4": "REJECTED twice over: a hotel room (kettle, coffee tray) and a readable emblem on the mug. Found only because a face-detector false-positived on the mug logo and the crop was actually looked at.",
+  "DEFECT_2.mp4": "Reads as a palette-knife painting, not a defect.",
+  "PREP_4.mp4": "A still life of tools with no hands and no action. The brief is 'the verb is the subject'; this has no verb.",
+  "MONEY_4.mp4": "A person's torso fills a third of the frame. No face is ever visible, but it is the only clip where one plausibly could be.",
+  "TIME_4.mp4": "A person at a wall calendar, head in frame and turned away. No face detected in any frame, but there is no reason to take the risk when TIME_1 does the same job."
+ },
+ "_depth_gap": "STILL OPEN after a sourcing pass. MONEY_1 still carries six of the twelve scripts. HOME is now split 3/3 between HOME_2 and HOME_4 (pexels 36778247, added after the sourcing pass - a full US colonial front, porch, red door, azaleas, slow dolly, face-clean across every frame and no signage at native resolution). It was the ONLY one of 54 candidates to survive. 54 candidates were pulled from Pexels (18 HOME, 18 MONEY, 18 staged rooms) and NOTHING was added. HOME: a shot through a car windscreen, a night sky, a house in falling snow (the brief excludes snow), a modernist barn on a concrete lot. MONEY: foreign currency passed to a child's hand, a briefcase of cash stacks - which is exactly the 'millions of dollars under a $5,000 figure' complaint the brief was written to stop - a blurry frame, a cut-out graphic rather than footage, and one promising wallet shot whose notes read BANK POLSKI at native resolution. A student recording all twelve will still see the same house and the same hands repeatedly. Pexels' portrait stock is thin here; the next attempt should try a different source rather than more queries against the same one.",
+ "_lengths": "3.5s default - the shortest insert in the delivered human edit. Longer only where the anchor sits on an enumeration the clip can carry. The editor's own inserts were 3.5/7.0/4.5s over 41.9s; ours are deliberately more conservative, but 2.8s was below anything a human actually cut.",
+ "_face_scan": "Every frame of all 26 clips was run through YuNet at 0.55. Nine clips flagged. Every single one was a FALSE POSITIVE, confirmed by looking at the crop: MONEY_1/MONEY_2/MONEY_4/APPROVAL_3 boxed a HAND, PREP_3 boxed a PAINTBRUSH, TIME_1 boxed a diary page, ROOM_3 boxed a LOGO ON A MUG. No clip in the library contains a human face. The detector earns its keep anyway: chasing its ROOM_3 false positive is what surfaced the hotel room and the branded mug.",
+ "_brand_check": "Every clip the bank actually uses has now been zoomed to native resolution and checked for readable text, which is the pass that caught FRIGIDAIRE on ROOM_1 and BANK POLSKI on a candidate. All clear. Two worth knowing about: APPROVAL_1's small print is a TEMPLATE employment contract - '[ABC Software Developers]' in square brackets, a placeholder, not a real company - and at delivery scale the body reads as illegible grey while only the headline CONTRACT is legible, which is what the brief asks for. HOME_2 shows a house number, which is an address, not a trademark. MONEY_1 trips the face detector on Benjamin Franklin's portrait; printed currency carries no right of publicity."
+}

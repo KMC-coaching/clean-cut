@@ -94,10 +94,6 @@ Info 'nothing here asks for a password'
 if ($LASTEXITCODE -ne 0) { Bad "setup finished with problems (code $LASTEXITCODE)"; }
 
 # ------------------------------------------------------------------ finish
-$ref = Join-Path $Dest 'clean-cut\reference'
-$missing = @('master-scripts.json', 'script-broll.json') |
-           Where-Object { -not (Test-Path (Join-Path $ref $_)) }
-
 $exe = $py[0]
 $pre = if ($py.Count -gt 1) { ($py[1..($py.Count - 1)] -join ' ') + ' ' } else { '' }
 $run = Join-Path $Dest 'clean-cut\scripts\run.py'
@@ -110,15 +106,4 @@ Write-Host "       $exe $pre`"$run`" `"my-video.mp4`"" -ForegroundColor Green
 Write-Host ''
 Write-Host '   The finished file appears next to the original, named'
 Write-Host '   my-video-edited.mp4.'
-if ($missing) {
-    Write-Host ''
-    Write-Host '   ONE THING IS STILL MISSING. Ask whoever sent you this for:'
-    $missing | ForEach-Object { Write-Host "       $_" }
-    Write-Host '   and save them into:'
-    Write-Host "       $ref"
-    Write-Host ''
-    Write-Host '   Without them it still edits your video - trimming, captions,'
-    Write-Host '   sound - but it cannot recognise which script you recorded, so'
-    Write-Host '   it will not add any b-roll.'
-}
 Write-Host ''

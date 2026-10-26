@@ -71,12 +71,6 @@ main() {
   bash "$DEST/clean-cut/scripts/setup.sh" || RC=$?
 
   # ---------------------------------------------------------------- finish
-  REF="$DEST/clean-cut/reference"
-  MISSING=""
-  for f in master-scripts.json script-broll.json; do
-    [ -f "$REF/$f" ] || MISSING="$MISSING $f"
-  done
-
   if [ "$RC" -ne 0 ]; then
     say "setup reported a problem (code $RC)"
     info "read the lines above - they name what is wrong."
@@ -91,17 +85,6 @@ main() {
   echo
   echo "   The finished file appears next to the original, named"
   echo "   my-video-edited.mp4."
-  if [ -n "$MISSING" ]; then
-    echo
-    echo "   ONE THING IS STILL MISSING. Ask whoever sent you this for:"
-    for f in $MISSING; do echo "       $f"; done
-    echo "   and save them into:"
-    echo "       $REF"
-    echo
-    echo "   Without them it still edits your video - trimming, captions,"
-    echo "   sound - but it cannot recognise which script you recorded, so"
-    echo "   it will not add any b-roll."
-  fi
   echo
 }
 

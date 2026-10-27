@@ -17,6 +17,8 @@ import platform
 import subprocess
 import sys
 import tempfile
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 import os
@@ -50,13 +52,41 @@ if key not in S.FFMPEG_BUILDS:
     sys.exit(f"FAIL no static build listed for {key}; "
              "a student here could not be self-healed")
 
-url, kind = S.FFMPEG_BUILDS[key]
-print(f"source:   {url}")
+urls, kind = S.FFMPEG_BUILDS[key]
+
+# Report EVERY listed source, not just the one that happens to work. A dead
+# primary that a fallback quietly rescues is exactly the state that rotted
+# unnoticed last time, so it has to be visible even on a passing run.
+dead = []
+for u in urls:
+    req = urllib.request.Request(u, method="HEAD", headers={
+        "User-Agent": "Mozilla/5.0 (clean-cut setup)"})
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            print(f"source:   {r.status} {u}")
+    except urllib.error.HTTPError as e:
+        # Only "the file is not there any more" counts as dead. A 503 is the
+        # publisher rate-limiting a burst of runners, and calling that a dead
+        # url would turn a busy afternoon into a red build.
+        if e.code in (404, 410):
+            print(f"source:   GONE {u}  ({e.code})")
+            dead.append(u)
+        else:
+            print(f"source:   {e.code} {u}  (transient, not treated as gone)")
+    except Exception as e:                                     # noqa: BLE001
+        print(f"source:   unreachable {u}  ({e}) - transient, not treated as gone")
+if dead and len(dead) == len(urls):
+    sys.exit("FAIL every listed source for this platform is gone")
+if dead:
+    print(f"WARNING {len(dead)} of {len(urls)} sources are gone; "
+          "the fallback is carrying this platform - replace the gone one")
+
 with tempfile.TemporaryDirectory() as td:
     tmp = Path(td)
     arc = tmp / f"ffmpeg.{kind}"
-    S.download(url, arc)
-    print(f"archive:  {arc.stat().st_size / 1048576:.0f} MB")
+    live = [u for u in urls if u not in dead]
+    S.download(live[0], arc)
+    print(f"archive:  {arc.stat().st_size / 1048576:.0f} MB from {live[0]}")
     got = S.extract_ffmpeg(arc, kind, tmp / "bin")
     print(f"binary:   {got.name}  {got.stat().st_size / 1048576:.0f} MB")
 

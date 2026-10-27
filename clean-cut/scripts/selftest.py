@@ -157,7 +157,8 @@ def check_ffmpeg_builds() -> None:
     import setup as S                                          # noqa: PLC0415
     key = (platform.system(), platform.machine())
     if key in S.FFMPEG_BUILDS:
-        ok(f"{key[0]} {key[1]} -> {S.FFMPEG_BUILDS[key][0].rsplit('/', 1)[-1]}")
+        names = [u.rsplit('/', 1)[-1] for u in S.FFMPEG_BUILDS[key][0]]
+        ok(f"{key[0]} {key[1]} -> {', then '.join(names)}")
     else:
         bad(f"no build listed for {key} - setup cannot self-heal a bad ffmpeg here")
     for k in sorted(S.FFMPEG_BUILDS):

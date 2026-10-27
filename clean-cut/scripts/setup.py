@@ -47,17 +47,26 @@ NEED_ENCODERS = ("libx264", "aac")
 
 # Static builds, one per platform. Each was downloaded and its embedded
 # configure string read before being listed here.
+# Each platform lists SEVERAL urls, tried in order, because the thing that
+# actually breaks here is a publisher renaming a file. osxexperts.net ships
+# a version number in the filename and deletes the old one when it rotates:
+# ffmpeg711intel.zip served fine for months and then became a 404, which
+# silently broke every Intel Mac install. A second url means a rotation
+# degrades to "the fallback was used" instead of "setup cannot finish".
+# The Linux and Windows urls are version-independent by design, so they get
+# one entry each; there is nothing to fall back to and nothing to rot.
 FFMPEG_BUILDS = {
-    ("Darwin", "arm64"):  ("https://www.osxexperts.net/ffmpeg711arm.zip", "zip"),
-    ("Darwin", "x86_64"): ("https://www.osxexperts.net/ffmpeg711intel.zip", "zip"),
-    ("Linux", "aarch64"): ("https://johnvansickle.com/ffmpeg/releases/"
-                           "ffmpeg-release-arm64-static.tar.xz", "tar"),
-    ("Linux", "x86_64"):  ("https://johnvansickle.com/ffmpeg/releases/"
-                           "ffmpeg-release-amd64-static.tar.xz", "tar"),
-    ("Windows", "AMD64"): ("https://www.gyan.dev/ffmpeg/builds/"
-                           "ffmpeg-release-essentials.zip", "zip"),
-    ("Windows", "ARM64"): ("https://www.gyan.dev/ffmpeg/builds/"
-                           "ffmpeg-release-essentials.zip", "zip"),
+    ("Darwin", "arm64"):  (("https://www.osxexperts.net/ffmpeg9arm.zip",
+                            "https://www.osxexperts.net/ffmpeg711arm.zip"), "zip"),
+    ("Darwin", "x86_64"): (("https://www.osxexperts.net/ffmpeg80intel.zip",), "zip"),
+    ("Linux", "aarch64"): (("https://johnvansickle.com/ffmpeg/releases/"
+                            "ffmpeg-release-arm64-static.tar.xz",), "tar"),
+    ("Linux", "x86_64"):  (("https://johnvansickle.com/ffmpeg/releases/"
+                            "ffmpeg-release-amd64-static.tar.xz",), "tar"),
+    ("Windows", "AMD64"): (("https://www.gyan.dev/ffmpeg/builds/"
+                            "ffmpeg-release-essentials.zip",), "zip"),
+    ("Windows", "ARM64"): (("https://www.gyan.dev/ffmpeg/builds/"
+                            "ffmpeg-release-essentials.zip",), "zip"),
 }
 
 YUNET = ("https://media.githubusercontent.com/media/opencv/opencv_zoo/main/"
@@ -173,18 +182,29 @@ def ensure_ffmpeg() -> str:
             "Install ffmpeg yourself with every one of:",
             "  " + ", ".join(NEED_FILTERS + NEED_ENCODERS),
             "then run this again.")
-    url, kind = FFMPEG_BUILDS[key]
+    urls, kind = FFMPEG_BUILDS[key]
     info(f"downloading a complete build for {key[0]} {key[1]}")
     info("no administrator password needed; it goes in ~/.clean-cut/bin")
+    got = None
+    failures = []
     with tempfile.TemporaryDirectory() as td:
-        arc = Path(td) / f"ffmpeg.{kind}"
-        try:
-            download(url, arc)
-            got = extract_ffmpeg(arc, kind, P.BIN_DIR)
-        except Exception as e:                                  # noqa: BLE001
-            die(f"could not fetch ffmpeg: {e}",
-                f"Download it by hand from {url}",
-                f"and put the ffmpeg binary in {P.BIN_DIR}")
+        for n, url in enumerate(urls):
+            arc = Path(td) / f"ffmpeg-{n}.{kind}"
+            try:
+                download(url, arc)
+                got = extract_ffmpeg(arc, kind, P.BIN_DIR)
+            except Exception as e:                              # noqa: BLE001
+                failures.append(f"{url} -> {e}")
+                if n + 1 < len(urls):
+                    info(f"that source did not answer ({e}); trying another")
+                continue
+            if n:
+                info(f"the usual source was unreachable; used {url}")
+            break
+    if got is None:
+        die("could not fetch ffmpeg from any source.",
+            *[f"  {f}" for f in failures],
+            f"Download one by hand and put the ffmpeg binary in {P.BIN_DIR}")
 
     missing = ffmpeg_lacks(str(got))
     if missing:

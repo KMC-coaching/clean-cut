@@ -31,10 +31,13 @@ jobs:
           # "new Windows, old Windows"
           - { os: windows-latest, name: "Windows (latest)",    group: windows }
           - { os: windows-2022, name: "Windows Server 2022",   group: windows }
-          # "new Mac, old Mac" - macos-13 is the last Intel image
+          # "new Mac, old Mac". GitHub retired the macos-13 image on
+          # 2025-12-04, so a job asking for it queues forever and is dropped
+          # after 24 hours rather than failing. macos-15-intel is the label
+          # that still gives an Intel Mac.
           - { os: macos-15,     name: "macOS 15 (Apple Si)",   group: mac }
           - { os: macos-14,     name: "macOS 14 (Apple Si)",   group: mac }
-          - { os: macos-13,     name: "macOS 13 (Intel)",      group: mac }
+          - { os: macos-15-intel, name: "macOS 15 (Intel)",    group: mac }
           - { os: ubuntu-24.04, name: "Ubuntu 24.04",          group: linux }
           - { os: ubuntu-22.04, name: "Ubuntu 22.04",          group: linux }
 

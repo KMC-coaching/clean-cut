@@ -69,6 +69,86 @@ FFMPEG_BUILDS = {
                             "ffmpeg-release-essentials.zip",), "zip"),
 }
 
+# The newest Python is not always the one that works. faster-whisper needs
+# onnxruntime, and onnxruntime has never published an Intel-macOS wheel past
+# cp313: on an Intel Mac running 3.14 pip cannot resolve it, backtracks through
+# old faster-whisper releases, and ends up trying to COMPILE PyAV against
+# ffmpeg headers that are not there. The student sees a page of pkg-config
+# errors after a two-minute download. So cap the version per platform and
+# build the environment with an interpreter that can actually install things.
+PY_CEILING = {
+    ("Darwin", "x86_64"): ((3, 13), "onnxruntime has no Intel-Mac build above 3.13"),
+}
+
+
+def py_ceiling() -> tuple:
+    """(major, minor), reason - or (None, "") when this platform has no cap."""
+    hit = PY_CEILING.get((platform.system(), platform.machine()))
+    return hit if hit else (None, "")
+
+
+def _version_of(exe: str) -> tuple:
+    try:
+        out = subprocess.run(
+            [exe, "-c", "import sys;print(*sys.version_info[:3])"],
+            capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return ()
+    if out.returncode != 0:
+        return ()
+    try:
+        return tuple(int(x) for x in out.stdout.split())
+    except ValueError:
+        return ()
+
+
+def usable_interpreter() -> tuple:
+    """The interpreter to build the venv with, and a note about the choice.
+
+    Returns (path, note). path is None when nothing on this machine fits, and
+    the note then says what is wrong, for preflight to print.
+    """
+    cap, why = py_ceiling()
+    here = tuple(sys.version_info[:3])
+    if cap is None or here[:2] <= cap:
+        return sys.executable, ""
+
+    # This interpreter is too new for the platform. Find one that is not.
+    # Bare "python3" is in the list on purpose and matters more than the
+    # versioned names: on a Mac with the Command Line Tools installed, the
+    # only other interpreter is /usr/bin/python3, which is NOT called
+    # python3.9 even though that is what it is. Every candidate is asked its
+    # version rather than trusted by name.
+    names = [f"python3.{m}" for m in range(cap[1], 8, -1)] + ["python3", "python"]
+    roots = [None,                                   # whatever is on PATH
+             "/usr/local/bin", "/opt/homebrew/bin", "/usr/bin",
+             "/Library/Frameworks/Python.framework/Versions"]
+    seen = set()
+    for name in names:
+        cands = []
+        for root in roots:
+            if root is None:
+                found = shutil.which(name)
+                if found:
+                    cands.append(found)
+            elif root.endswith("Versions"):
+                if name.startswith("python3."):
+                    cands.append(f"{root}/{name[6:]}/bin/{name}")
+            else:
+                cands.append(f"{root}/{name}")
+        for c in cands:
+            real = str(Path(c).resolve()) if Path(c).exists() else c
+            if real in seen or not Path(c).exists():
+                continue
+            seen.add(real)
+            v = _version_of(c)
+            if v and (3, 9) <= v[:2] <= cap:
+                return c, (f"this Python is {platform.python_version()}, too new "
+                           f"here ({why}); using {'.'.join(map(str, v))} at {c}")
+    return None, (f"this Python is {platform.python_version()} and {why}. "
+                  f"No Python between 3.9 and {cap[0]}.{cap[1]} was found.")
+
+
 YUNET = ("https://media.githubusercontent.com/media/opencv/opencv_zoo/main/"
          "models/face_detection_yunet/face_detection_yunet_2023mar.onnx")
 
@@ -231,6 +311,17 @@ def preflight() -> None:
         die(f"This Python is {platform.python_version()}; 3.9 or newer is needed.")
     info(f"python {platform.python_version()}  ({sys.executable})")
 
+    chosen, note = usable_interpreter()
+    if chosen is None:
+        cap, _ = py_ceiling()
+        die(note,
+            "Install one and run this again. The easiest route:",
+            f"  https://www.python.org/downloads/release/python-3{cap[1]}0/",
+            "Pick the macOS 64-bit Intel installer.",
+            "Nothing needs uninstalling; they sit side by side.")
+    if note:
+        info(note)
+
     try:
         import venv                                            # noqa: F401,PLC0415
     except ImportError:
@@ -258,13 +349,28 @@ def preflight() -> None:
 def ensure_venv() -> Path:
     say("python environment")
     py = P.venv_python()
+    base, _ = usable_interpreter()
+    if base is None:                     # preflight already explained and died
+        die("no usable python; see the message above")
+
+    cap, why = py_ceiling()
+    if py.exists() and cap is not None:
+        # A previous run may have built this environment with a Python that
+        # cannot install the packages. Leaving it in place means every retry
+        # fails the same way forever, so replace it rather than reuse it.
+        have = _version_of(str(py))
+        if have and have[:2] > cap:
+            info(f"the existing environment is python {'.'.join(map(str, have))}, "
+                 f"which cannot work here ({why}) - rebuilding it")
+            shutil.rmtree(P.VENV_DIR, ignore_errors=True)
+
     if not py.exists():
         info(f"creating a private environment in {P.VENV_DIR}")
         try:
             # Swallow the output: when this fails on Debian or Ubuntu, venv
             # prints its own several-line "you need sudo apt install
             # python3-venv" notice, which flatly contradicts what we do next.
-            run([sys.executable, "-m", "venv", str(P.VENV_DIR)],
+            run([base, "-m", "venv", str(P.VENV_DIR)],
                 capture_output=True)
         except subprocess.CalledProcessError:
             # Almost always a Debian/Ubuntu box with no ensurepip. Build the
@@ -273,7 +379,7 @@ def ensure_venv() -> Path:
             info("no bundled pip here - building without it and adding pip")
             shutil.rmtree(P.VENV_DIR, ignore_errors=True)
             try:
-                run([sys.executable, "-m", "venv", "--without-pip", str(P.VENV_DIR)])
+                run([base, "-m", "venv", "--without-pip", str(P.VENV_DIR)])
             except subprocess.CalledProcessError:
                 die("could not create a virtual environment.",
                     "Debian or Ubuntu:  sudo apt install python3-venv")
